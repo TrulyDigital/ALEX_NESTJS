@@ -1,0 +1,40 @@
+# Sub Directory git of each project
+**./.git
+
+# Compiled output of each project
+**/dist
+**/dist/*
+**/node_modules
+**/node_modules/*
+**/.scannerwork
+**/.scannerwork/*
+**/coverage
+**/coverage/*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests of each project
+**/coverage
+**/.nyc_output
+
+# IDEs and editors of each project
+**/.idea
+**/.project
+**/.classpath
+**/.c9/
+**/*.launch
+**/.settings/
+**/*.sublime-workspace
+
+# IDE - VSCode of each project
+**/.vscode/*

@@ -1,0 +1,158 @@
+{
+	"info": {
+		"_postman_id": "6577417d-0b63-4157-8374-44d6a36b92e0",
+		"name": "3_HEXAGONAL_ARCH",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37437429"
+	},
+	"item": [
+		{
+			"name": "MSOracleDatabasePoc",
+			"item": [
+				{
+					"name": "Unit_Tests",
+					"item": [
+						{
+							"name": "http_200_default",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"iccid\": \"89571018020080284633\",\r\n\t\"provider_id\": \" PA00003201\",\r\n\t\"enterprise_id\": \"GMCLAROCO\",\r\n\t\"eid\": \"89033023311330000000025620184895\",\r\n\t\"imei\": \"\",\r\n\t\"plan_id\": \"AH001\",\r\n\t\"location\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}",
+									"host": [
+										"{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "http_200_req1",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"iccid\": \"1111\",\r\n\t\"provider_id\": \" PA00003201\",\r\n\t\"enterprise_id\": \"GMCLAROCO\",\r\n\t\"eid\": \"89033023311330000000025620184895\",\r\n\t\"imei\": \"\",\r\n\t\"plan_id\": \"AH001\",\r\n\t\"location\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}",
+									"host": [
+										"{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "http_500_req1",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"iccid\": \"001\",\r\n\t\"provider_id\": \" PA00003201\",\r\n\t\"enterprise_id\": \"GMCLAROCO\",\r\n\t\"eid\": \"89033023311330000000025620184895\",\r\n\t\"imei\": \"\",\r\n\t\"plan_id\": \"AH001\",\r\n\t\"location\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}",
+									"host": [
+										"{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "http_502_req1",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"iccid\": \"003\",\r\n\t\"provider_id\": \" PA00003201\",\r\n\t\"enterprise_id\": \"GMCLAROCO\",\r\n\t\"eid\": \"89033023311330000000025620184895\",\r\n\t\"imei\": \"\",\r\n\t\"plan_id\": \"AH001\",\r\n\t\"location\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}",
+									"host": [
+										"{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "http_504_req1",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"iccid\": \"002\",\r\n\t\"provider_id\": \" PA00003201\",\r\n\t\"enterprise_id\": \"GMCLAROCO\",\r\n\t\"eid\": \"89033023311330000000025620184895\",\r\n\t\"imei\": \"\",\r\n\t\"plan_id\": \"AH001\",\r\n\t\"location\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}",
+									"host": [
+										"{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "http_200_req1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"iccid\": \"89571018020080284633\",\r\n\t\"provider_id\": \" PA00003201\",\r\n\t\"enterprise_id\": \"GMCLAROCO\",\r\n\t\"eid\": \"89033023311330000000025620184895\",\r\n\t\"imei\": \"\",\r\n\t\"plan_id\": \"AH001\",\r\n\t\"location\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}",
+							"host": [
+								"{{endpoint_msoracledatabasepoc}}{{basepath_msoracledatabasepoc}}{{op_find_properties}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

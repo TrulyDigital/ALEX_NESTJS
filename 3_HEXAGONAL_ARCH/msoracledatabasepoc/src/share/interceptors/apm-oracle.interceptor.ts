@@ -1,6 +1,6 @@
-import { LegacyNames } from "../../share/enums/legacy-names.enum";
-import { OracleConnectionDto } from "../dtos/oracle-connection.dto";
-import { DataConfigInfraestructureDto } from "../../share/dtos/data-config-infraestructure.dto";
+import { LegacyNames } from "../enums/legacy-names.enum";
+import { OracleConnectionDto } from "../../infraestructure/dtos/oracle-connection.dto";
+import { DataConfigInfraestructureDto } from "../dtos/data-config-infraestructure.dto";
 import * as apm from 'elastic-apm-node';
 
 export function ApmOracleInterceptor(): InterceptorType{

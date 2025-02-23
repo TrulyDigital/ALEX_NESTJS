@@ -12,7 +12,7 @@ async function bootstrap() {
    * Definir APM antes que inicie el servidor express
    * 
    */
-  const apmConfiguration = {
+  const apm_agent = {
     serviceName: process.env.ELASTIC_APM_SERVICE_NAME,
     environment: process.env.ELASTIC_APM_ENVIRONMENT,
     secretToken: process.env.ELASTIC_APM_SECRET_TOKEN,
@@ -21,7 +21,7 @@ async function bootstrap() {
     stackTraceLimit: 500,
     active: process.env.ELASTIC_APM_ACTIVE === 'true' ? true : false,
   }; 
-  apm.start(apmConfiguration);
+  apm.start(apm_agent);
 
   const app = await NestFactory.create(AppModule);
   await app.listen(routes.APPLICATION_PORT);

@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestMiddleware, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config'; 
 import { WinstonModule } from 'nest-winston';
 import { HttpExceptionFilter } from './share/exception/http-exception.filter';
@@ -16,11 +16,11 @@ import { AppStateService } from './share/services/app-state.service';
 import { WinstonLoggerService } from './share/winston/winston-logs.service';
 import { LoggerRepository } from './domain/repositories/logger.repository';
 import { DataConfigRepository } from './domain/repositories/data-config.repository';
+import { MiddlewareService } from './interfaces/middlewares/middleware.service';
+import { RegisterResourcesController } from './interfaces/controllers/register-resources.controller';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 import * as winston from "winston";
-import { MiddlewareService } from './interfaces/middlewares/middleware.service';
-import { RegisterResourcesController } from './interfaces/controllers/register-resources.controller';
 
 @Module({
 

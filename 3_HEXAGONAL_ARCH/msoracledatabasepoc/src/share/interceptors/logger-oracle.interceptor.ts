@@ -1,12 +1,12 @@
 
 import { LoggerEntity } from "../../domain/entities/logger.entity";
 import { LoggerRepository } from "../../domain/repositories/logger.repository";
-import { OracleConnectionDto } from "../dtos/oracle-connection.dto";
-import { tools } from "../../share/tools/tools";
-import { LegacyNames } from "../../share/enums/legacy-names.enum";
+import { OracleConnectionDto } from "../../infraestructure/dtos/oracle-connection.dto";
+import { tools } from "../tools/tools";
+import { LegacyNames } from "../enums/legacy-names.enum";
 import { HttpException } from "@nestjs/common";
-import { AppStateService } from "../../share/services/app-state.service";
-import { DataConfigInfraestructureDto } from "../../share/dtos/data-config-infraestructure.dto";
+import { AppStateService } from "../services/app-state.service";
+import { DataConfigInfraestructureDto } from "../dtos/data-config-infraestructure.dto";
 
 export function LoggerOracleInterceptor<IN,OUT,FAULT>(): InterceptorType{
   return function(

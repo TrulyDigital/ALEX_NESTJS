@@ -1,7 +1,7 @@
 import { ValidationError } from "class-validator";
 import { fromZonedTime, format } from "date-fns-tz";
 import { FaultDto } from "../dtos/fault.dto";
-import { ErrorCodes, ErrorMessages } from "../enums/error-codes.enum";
+import { ErrorCodes, ErrorMessages } from "../enums/error-codes-and-messages.enum";
 import { LegacyNames } from "../enums/legacy-names.enum";
 
 /**
@@ -51,8 +51,8 @@ function get_fault_CODE_001(
     status_code: 500,
     message: 'Internal Server Error',
     error: {
-      code: ErrorCodes.CODE_001,
-      message: ErrorMessages.MSG_001,
+      code: ErrorCodes.ERR_001,
+      message: ErrorMessages.MSG_001_1,
       legacy: legacy,
       date_time: tools.get_current_date(),
       description: [
@@ -75,8 +75,8 @@ function get_fault_CODE_002(
     status_code: 504,
     message: 'Gateway Timeout',
     error: {
-      code: ErrorCodes.CODE_002,
-      message: ErrorMessages.MSG_002,
+      code: ErrorCodes.ERR_001,
+      message: ErrorMessages.MSG_001_2,
       legacy: legacy,
       date_time: tools.get_current_date(),
       description: [

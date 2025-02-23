@@ -7,16 +7,16 @@ import { OracleConnectionDto } from "../dtos/oracle-connection.dto";
 import { OracleDatabaseService } from "../oracle/oracle-database.service";
 import { OutPrcRegistraUsuariosDto } from "../dtos/out-prc-registra-usuarios.dto";
 import { OracleDatabaseServiceSpec } from "../oracle/oracle-database.service.spec";
-import { LoggerOracleInterceptor } from "../interceptors/logger-oracle.interceptor";
+import { LoggerOracleInterceptor } from "../../share/interceptors/logger-oracle.interceptor";
 import { AppStateService } from "../../share/services/app-state.service";
 import { LoggerRepository } from "../../domain/repositories/logger.repository";
 import { plainToInstance } from "class-transformer";
 import { validate, ValidationError } from "class-validator";
 import { tools } from "../../share/tools/tools";
 import { FaultDto } from "../../share/dtos/fault.dto";
-import { ErrorCodes, ErrorMessages } from "../../share/enums/error-codes.enum";
+import { ErrorCodes, ErrorMessages } from "../../share/enums/error-codes-and-messages.enum";
 import { LegacyNames } from "../../share/enums/legacy-names.enum";
-import { ApmOracleInterceptor } from "../interceptors/apm-oracle.interceptor";
+import { ApmOracleInterceptor } from "../../share/interceptors/apm-oracle.interceptor";
 import { DataConfigRepository } from "../../domain/repositories/data-config.repository";
 import { DataConfigInfraestructureDto } from "../../share/dtos/data-config-infraestructure.dto";
 import * as oracledb from 'oracledb';
@@ -142,8 +142,8 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
         status_code: 502,
         message: 'Bad Gateway',
         error: {
-          code: ErrorCodes.CODE_003,
-          message: ErrorMessages.MSG_003,
+          code: ErrorCodes.ERR_001,
+          message: ErrorMessages.MSG_001_3,
           legacy: LegacyNames.LEGACY_BSCS,
           date_time: tools.get_current_date(),
           description: description_errors

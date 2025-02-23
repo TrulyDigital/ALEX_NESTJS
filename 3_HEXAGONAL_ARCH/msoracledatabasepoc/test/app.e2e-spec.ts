@@ -28,7 +28,7 @@ describe('AppController (e2e)', () => {
 
   it('/FIND/Proerties - 200 - POST', () => {
     return request(app.getHttpServer())
-      .post(`${routes.APPLICATION_BASE_PATH}${routes.APPLICATION_OPERATION_QUERY_PROPERTIES}`)
+      .post(`${routes.APPLICATION_BASE_PATH}${routes.APPLICATION_OPERATION_REGISTER_RESOURCES}`)
       .send(register_resources_controller_mock_data.request_1)
       .expect(200)
   });
@@ -43,21 +43,21 @@ describe('AppController (e2e)', () => {
 
   it('/FIND/Proerties - 500 - POST', () => {
     return request(app.getHttpServer())
-      .post(`${routes.APPLICATION_BASE_PATH}${routes.APPLICATION_OPERATION_QUERY_PROPERTIES}`)
+      .post(`${routes.APPLICATION_BASE_PATH}${routes.APPLICATION_OPERATION_REGISTER_RESOURCES}`)
       .send(register_resources_controller_mock_data.request_2)
       .expect(500)
   });
 
   it('/FIND/Proerties - 502 - POST', () => {
     return request(app.getHttpServer())
-      .post(`${routes.APPLICATION_BASE_PATH}${routes.APPLICATION_OPERATION_QUERY_PROPERTIES}`)
+      .post(`${routes.APPLICATION_BASE_PATH}${routes.APPLICATION_OPERATION_REGISTER_RESOURCES}`)
       .send(register_resources_controller_mock_data.request_3)
       .expect(502)
   });
 
   it('/FIND/Proerties - 504 - POST', () => {
     return request(app.getHttpServer())
-      .post(`${routes.APPLICATION_BASE_PATH}${routes.APPLICATION_OPERATION_QUERY_PROPERTIES}`)
+      .post(`${routes.APPLICATION_BASE_PATH}${routes.APPLICATION_OPERATION_REGISTER_RESOURCES}`)
       .send(register_resources_controller_mock_data.request_4)
       .expect(504)
   });
@@ -82,8 +82,8 @@ describe('AppController (e2e)', () => {
     expect(get_app_swagger_path(undefined)).toBe(routes.APPLICATION_SWAGGER_PATH);
   });
 
-  it('Routes - Operation OrderKO', () => {
-    expect(get_app_operation_find_properties(undefined)).toBe(routes.APPLICATION_OPERATION_QUERY_PROPERTIES);
+  it('Routes - Operation RegisterResources', () => {
+    expect(get_app_operation_find_properties(undefined)).toBe(routes.APPLICATION_OPERATION_REGISTER_RESOURCES);
   });
 
   /**

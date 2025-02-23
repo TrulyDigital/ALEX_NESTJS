@@ -4,24 +4,26 @@ import { RegisterResourcesOutEntity } from "../../domain/entities/register-resou
 import { RegisterResourcesRepository } from "../../domain/repositories/register-resources.repository";
 import { OracleDatabaseStrategy } from "../oracle/oracle-database.strategy";
 import { OracleConnectionDto } from "../dtos/oracle-connection.dto";
-import { EnvironmentConfigService } from "../config/environment-config.service";
 import { OracleDatabaseService } from "../oracle/oracle-database.service";
-import { DatabaseConfigService } from "../config/database-config.service";
 import { OutPrcRegistraUsuariosDto } from "../dtos/out-prc-registra-usuarios.dto";
 import { OracleDatabaseServiceSpec } from "../oracle/oracle-database.service.spec";
-import { OracleDatabaseInterceptor } from "../interceptors/oracle-database.interceptor";
+import { LoggerOracleInterceptor } from "../interceptors/logger-oracle.interceptor";
 import { AppStateService } from "../../share/services/app-state.service";
-import { I_LOG_REPOSITORY, LogRepository } from "../../domain/repositories/log.repository";
+import { LoggerRepository } from "../../domain/repositories/logger.repository";
 import { plainToInstance } from "class-transformer";
 import { validate, ValidationError } from "class-validator";
 import { tools } from "../../share/tools/tools";
 import { FaultDto } from "../../share/dtos/fault.dto";
 import { ErrorCodes, ErrorMessages } from "../../share/enums/error-codes.enum";
 import { LegacyNames } from "../../share/enums/legacy-names.enum";
+import { ApmOracleInterceptor } from "../interceptors/apm-oracle.interceptor";
+import { DataConfigRepository } from "../../domain/repositories/data-config.repository";
+import { DataConfigInfraestructureDto } from "../../share/dtos/data-config-infraestructure.dto";
 import * as oracledb from 'oracledb';
 
 type IN = any;
 type OUT = OutPrcRegistraUsuariosDto;
+type FAULT = FaultDto;
 
 @Injectable()
 export class PrcRegistraUsuariosService implements RegisterResourcesRepository, OracleDatabaseStrategy{
@@ -29,50 +31,40 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
   // variables of the class
   private db: OracleDatabaseStrategy;
   private database_procedure_path: string;
-  private application_name: string;
-  private method_name: string;
   private timeout: number;
-  private verb: string;
   private transaction_id: string;
+  private config: DataConfigInfraestructureDto;
 
   // constructor
   constructor(
-    private readonly environment_config: EnvironmentConfigService,
     private readonly app_state: AppStateService,
-    private readonly database_config: DatabaseConfigService,
-    @Inject(I_LOG_REPOSITORY) private readonly winston: LogRepository
+    @Inject(DataConfigRepository) private readonly env_data: DataConfigRepository,
+    @Inject(LoggerRepository) private readonly winston: LoggerRepository
   ){
+    this.config = this.env_data.get_data_config_infraestructure();
+    this.timeout = this.config.timeout;
+    this.database_procedure_path = this.config.database_procedure_path;
 
-    this.application_name = this.environment_config.get_application_name();
-    this.method_name = this.environment_config.get_operation_connectivity();
-    this.timeout = this.environment_config.get_timeout();
-    this.verb = 'POST';
-    this.database_procedure_path = this.database_config.get_database_procedure_path();
-
-    const context: string = this.environment_config.get_application_context();
+    const context: string = this.config.application_context;
     if(context.toLowerCase() === 'test') this.db = new OracleDatabaseServiceSpec();
     else this.db = new OracleDatabaseService();
   }
 
   /**
    * 
-   * Getters
+   * Getters 
    * 
    */
 
-  get_application_name(): string{
-    return this.application_name;
+  get_app_state(): AppStateService{
+    return this.app_state;
   }
 
-  get_method_name(): string{
-    return this.method_name;
+  get_data_config(): DataConfigInfraestructureDto{
+    return this.env_data.get_data_config_infraestructure();
   }
 
-  get_verb(): string{
-    return this.verb;
-  }
-
-  get_log_repository(): LogRepository{
+  get_logger_repository(): LoggerRepository{
     return this.winston;
   }
 
@@ -85,7 +77,8 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
    * 
    */
 
-  @OracleDatabaseInterceptor<IN,OUT>
+  @ApmOracleInterceptor()
+  @LoggerOracleInterceptor<IN,OUT,FAULT>()
   async execute_oracle_store_procedure(
     transaction_id: string,
     timeout: number,
@@ -221,9 +214,9 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
 
   get_oracle_connection(): OracleConnectionDto{
     return {
-      user: this.database_config.get_database_user(),
-      password: this.database_config.get_database_pass(),
-      connectString: this.database_config.get_database_string()
+      user: this.config.database_user,
+      password: this.config.database_pass,
+      connectString: this.config.database_string,
     }
   }
   

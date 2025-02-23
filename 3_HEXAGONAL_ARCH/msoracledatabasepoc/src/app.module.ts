@@ -1,20 +1,32 @@
-import { Module } from '@nestjs/common';
-import { ApplicationModule } from './application/application.module';
-import { InfraestructureModule } from './infraestructure/infraestructure.module';
-import { InterfacesModule } from './interfaces/interfaces.module';
+import { MiddlewareConsumer, Module, NestMiddleware, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config'; 
 import { WinstonModule } from 'nest-winston';
+import { HttpExceptionFilter } from './share/exception/http-exception.filter';
+import { APP_FILTER } from '@nestjs/core';
+import { RegisterResourcesRepository } from './domain/repositories/register-resources.repository';
+import { PrcRegistraUsuariosService } from './infraestructure/database/prc-registra-usuarios.service';
+import { OracleDatabaseService } from './infraestructure/oracle/oracle-database.service';
+import { OracleDatabaseServiceSpec } from './infraestructure/oracle/oracle-database.service.spec';
+import { RegisterResourcesService } from './application/services/register-resources.service';
+import { CircuitBreakerConfigService } from './share/config/services/circuit-breaker-config.service';
+import { DatabaseConfigService } from './share/config/services/database-config.service';
+import { EnvironmentConfigService } from './share/config/services/environment-config.service';
+import { AllConfigService } from './share/config/services/all-config.service';
+import { AppStateService } from './share/services/app-state.service';
+import { WinstonLoggerService } from './share/winston/winston-logs.service';
+import { LoggerRepository } from './domain/repositories/logger.repository';
+import { DataConfigRepository } from './domain/repositories/data-config.repository';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 import * as winston from "winston";
-import { ShareModule } from './share/share.module';
-import { HttpExceptionFilter } from './share/exception/http-exception.filter';
-import { APP_FILTER } from '@nestjs/core';
+import { MiddlewareService } from './interfaces/middlewares/middleware.service';
+import { RegisterResourcesController } from './interfaces/controllers/register-resources.controller';
 
 @Module({
+
   imports: [
 
-    // load envinronmet data
+    // load envinronmet data 
     ConfigModule.forRoot({
       load: [
         () => {
@@ -25,7 +37,7 @@ import { APP_FILTER } from '@nestjs/core';
               path: path.resolve(
                 __dirname, 
                 '..', 
-                'src/infraestructure/config', 
+                'src/share/config/env', 
                 '.env.context'
               ) 
             }
@@ -47,7 +59,7 @@ import { APP_FILTER } from '@nestjs/core';
                 path: path.resolve(
                   __dirname,
                   '..',
-                  'src/infraestructure/config',
+                  'src/share/config/env',
                   '.env.main'
                 )
               }
@@ -66,7 +78,7 @@ import { APP_FILTER } from '@nestjs/core';
                 path: path.resolve(
                   __dirname,
                   '..',
-                  'src/infraestructure/config',
+                  'src/share/config/env',
                   '.env.local'
                 )
               }
@@ -85,7 +97,7 @@ import { APP_FILTER } from '@nestjs/core';
                 path: path.resolve(
                   __dirname,
                   '..',
-                  'src/infraestructure/config',
+                  'src/share/config/env',
                   '.env.test'
                 )
               }
@@ -108,7 +120,7 @@ import { APP_FILTER } from '@nestjs/core';
                 path: path.resolve(
                   __dirname,
                   '..',
-                  'src/infraestructure/config',
+                  'src/share/config/env',
                   '.env.local'
                 )
               }
@@ -135,25 +147,56 @@ import { APP_FILTER } from '@nestjs/core';
       ]
     }),
 
-    // logs & audit
+    // logger & audit
     WinstonModule.forRoot({
       transports: [
         new winston.transports.Console({ format: winston.format.json() })
       ]
     }),
 
-    ShareModule,
-    ApplicationModule,
-    InfraestructureModule,
-    InterfacesModule,
   ],
 
   providers:[
+
+    // infraestructure
+    {
+      useClass: PrcRegistraUsuariosService,
+      provide: RegisterResourcesRepository,
+    },
+    OracleDatabaseService,
+    OracleDatabaseServiceSpec,
+
+    // application
+    RegisterResourcesService,
+
+    // share
+    AppStateService,
+    CircuitBreakerConfigService,
+    DatabaseConfigService,
+    EnvironmentConfigService,
+    {
+      useClass: AllConfigService,
+      provide: DataConfigRepository,
+    },
+    {
+      useClass: WinstonLoggerService,
+      provide: LoggerRepository,
+    },
     {
       useClass: HttpExceptionFilter,
       provide: APP_FILTER,
-    }
+    },
   ],
 
+  controllers:[
+    RegisterResourcesController,
+  ]
+
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(MiddlewareService)
+      .forRoutes('*');
+  }
+}

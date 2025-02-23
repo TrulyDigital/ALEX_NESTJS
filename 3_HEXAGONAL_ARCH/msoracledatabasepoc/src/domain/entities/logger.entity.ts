@@ -1,4 +1,4 @@
-type LogType<T1,T2> = {
+type LoggerType<T1,T2> = {
   applicationName: string;
   methodName: string;
   verb: string;
@@ -12,7 +12,7 @@ type LogType<T1,T2> = {
   response: T2;
 }
 
-export class LogEntity <T1,T2>{
+export class LoggerEntity <IN,OUT,FAULT>{
 
   private applicationName: string;
   private methodName: string;
@@ -23,8 +23,8 @@ export class LogEntity <T1,T2>{
   private message: string;
   private processingTime: number;
   private timeStamp: string;
-  private request: T1;
-  private response: T2 | string;
+  private request: IN;
+  private response: FAULT | OUT | string;
 
   constructor(
     application_name: string,
@@ -68,11 +68,11 @@ export class LogEntity <T1,T2>{
     this.timeStamp = time_stamp;
   }
 
-  set_request(request: T1): void{
+  set_request(request: IN): void{
     this.request = request;
   }
 
-  set_response(response: T2 | string): void{
+  set_response(response: FAULT | OUT | string): void{
     this.response = response;
   }
 
@@ -82,7 +82,7 @@ export class LogEntity <T1,T2>{
    * 
    */
 
-  get_log(): LogType<T1,T2 | string>{
+  get_logger_object(): LoggerType<IN,FAULT | OUT | string>{
     return {
       applicationName: this.applicationName,
       methodName: this.methodName,

@@ -30,6 +30,10 @@ export class MiddlewareService implements NestMiddleware{
     }
 
     this.app_state.set_transaction_id(transaction_id_new);
+
+    const verb: string = request_express.method;
+    this.app_state.set_verb(verb);
+
     response_express.set('transactionid', transaction_id_new);
     response_express.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { I_REGISTER_RESOURCES_REPOSITORY, RegisterResourcesRepository } from "../../domain/repositories/register-resources.repository";
+import { RegisterResourcesRepository } from "../../domain/repositories/register-resources.repository";
 import { InRegisterResourcesDto } from "../dtos/in-register-resources.dto";
 import { RegisterResourcesInEntity } from "../../domain/entities/register-resources-in.entity";
 import { RegisterResourcesOutEntity } from "../../domain/entities/register-resources-out.entity";
@@ -12,7 +12,7 @@ export class RegisterResourcesService{
   private register_resources_out: RegisterResourcesOutEntity;
 
   constructor(
-    @Inject(I_REGISTER_RESOURCES_REPOSITORY) private readonly db_repository: RegisterResourcesRepository
+    @Inject(RegisterResourcesRepository) private readonly db: RegisterResourcesRepository
   ){}
 
   async update_register_resources(
@@ -29,7 +29,7 @@ export class RegisterResourcesService{
       body_in.location,
     );
 
-    this.register_resources_out = await this.db_repository.update_one(this.register_resources_in);
+    this.register_resources_out = await this.db.update_one(this.register_resources_in);
     const body_out: OutRegisterResourcesDto = {
       transaction_id: this.register_resources_out.get_transaction_id(),
       status_code: 200,
@@ -43,4 +43,5 @@ export class RegisterResourcesService{
 
     return body_out;
   }
+
 }

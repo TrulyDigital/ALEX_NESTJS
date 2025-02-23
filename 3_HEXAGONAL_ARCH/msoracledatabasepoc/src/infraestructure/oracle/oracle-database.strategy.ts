@@ -8,6 +8,6 @@ export interface OracleDatabaseStrategy{
     legacy: LegacyNames,
     oracle_connection: OracleConnectionDto,
     string_contract: string,
-    object_contract: any
+    object_contract: any,
   ): Promise<unknown>;
 }

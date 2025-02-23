@@ -9,7 +9,7 @@ function main() {
     'sonar.projectVersion': '1.0',
     'sonar.language': 'ts',
     'sonar.sourceEncoding': 'UTF-8',
-    'sonar.projectKey': process.env.APP_NAME,
+    'sonar.projectKey': process.env.APPLICATION_NAME,
     'sonar.sources': 'src',
     'sonar.exclusions': 'tests/**,node_modules/**,coverage/**,**/*.spec.ts,**/main.ts,**/*.module.ts,**/*.doc.ts',
     'sonar.typescript.lcov.reportPaths': 'coverage/lcov.info',

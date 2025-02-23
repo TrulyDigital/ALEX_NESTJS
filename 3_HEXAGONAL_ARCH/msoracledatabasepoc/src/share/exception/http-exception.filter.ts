@@ -14,11 +14,12 @@ export class HttpExceptionFilter implements ExceptionFilter{
 
     const catch_fault: FaultDto = exception.getResponse();
 
+    console.log(catch_fault);
+
     return response_express
       .status(catch_fault.status_code)
       .setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
       .json(catch_fault);
-    
   }
   
 }

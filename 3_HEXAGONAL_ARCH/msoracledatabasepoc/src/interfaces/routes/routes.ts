@@ -13,7 +13,7 @@ type RoutesType = {
   APPLICATION_BASE_PATH: string;
   APPLICATION_PORT: string;
   APPLICATION_SWAGGER_PATH: string;
-  APPLICATION_OPERATION_QUERY_PROPERTIES: string;
+  APPLICATION_OPERATION_REGISTER_RESOURCES: string;
 };
 
 // configuración .env raiz.
@@ -117,9 +117,9 @@ export function get_app_operation_find_properties(
   operation: string | undefined,
 ): string{
   if(operation === undefined){
-    return '/FIND/Proerties'
+    return '/New/Resources'
   }
-  return envRoot.APPLICATION_OPERATION_QUERY_PROPERTIES;
+  return envRoot.APPLICATION_OPERATION_REGISTER_RESOURCES;
 }
 
 /**
@@ -139,8 +139,8 @@ export const routes: RoutesType = {
   APPLICATION_SWAGGER_PATH: get_app_swagger_path(
     envRoot.APPLICATION_SWAGGER_PATH,
   ),
-  APPLICATION_OPERATION_QUERY_PROPERTIES: get_app_operation_find_properties(
-    envRoot.APPLICATION_OPERATION_QUERY_PROPERTIES,
+  APPLICATION_OPERATION_REGISTER_RESOURCES: get_app_operation_find_properties(
+    envRoot.APPLICATION_OPERATION_REGISTER_RESOURCES,
   )
 }
 

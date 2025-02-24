@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config'; 
 import { WinstonModule } from 'nest-winston';
-import { HttpExceptionFilter } from './share/exception/http-exception.filter';
+import { HttpExceptionFilter } from './share/exception/filters/http-exception.filter';
 import { APP_FILTER } from '@nestjs/core';
 import { RegisterResourcesRepository } from './domain/repositories/register-resources.repository';
 import { PrcRegistraUsuariosService } from './infraestructure/database/prc-registra-usuarios.service';
@@ -11,8 +11,8 @@ import { RegisterResourcesService } from './application/services/register-resour
 import { CircuitBreakerConfigService } from './share/config/services/circuit-breaker-config.service';
 import { DatabaseConfigService } from './share/config/services/database-config.service';
 import { EnvironmentConfigService } from './share/config/services/environment-config.service';
-import { AllConfigService } from './share/config/services/all-config.service';
-import { AppStateService } from './share/services/app-state.service';
+import { DataConfigService } from './share/config/services/data-config.service';
+import { AppStateService } from './share/state/app-state.service';
 import { WinstonLoggerService } from './share/winston/winston-logs.service';
 import { LoggerRepository } from './domain/repositories/logger.repository';
 import { DataConfigRepository } from './domain/repositories/data-config.repository';
@@ -149,9 +149,7 @@ import * as winston from "winston";
 
     // logger & audit
     WinstonModule.forRoot({
-      transports: [
-        new winston.transports.Console({ format: winston.format.json() })
-      ]
+      transports: [new winston.transports.Console({format: winston.format.json()})]
     }),
 
   ],
@@ -175,7 +173,7 @@ import * as winston from "winston";
     DatabaseConfigService,
     EnvironmentConfigService,
     {
-      useClass: AllConfigService,
+      useClass: DataConfigService,
       provide: DataConfigRepository,
     },
     {

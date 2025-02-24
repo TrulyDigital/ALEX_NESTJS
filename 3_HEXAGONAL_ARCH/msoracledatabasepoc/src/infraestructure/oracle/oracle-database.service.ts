@@ -1,7 +1,7 @@
 import { GatewayTimeoutException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { OracleDatabaseStrategy } from "./oracle-database.strategy";
 import { OracleConnectionDto } from "../dtos/oracle-connection.dto";
-import { FaultDto } from "../../share/dtos/fault.dto";
+import { FaultDto } from "../../share/exception/dtos/fault.dto";
 import { tools } from "../../share/tools/tools";
 import { LegacyNames } from "../../share/enums/legacy-names.enum";
 import * as oracledb from "oracledb";

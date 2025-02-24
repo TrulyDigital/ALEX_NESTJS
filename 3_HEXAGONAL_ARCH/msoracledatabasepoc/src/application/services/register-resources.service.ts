@@ -6,7 +6,8 @@ import { RegisterResourcesOutEntity } from "../../domain/entities/register-resou
 import { OutRegisterResourcesDto } from "../dtos/out-register-resources.dto";
 import { LoggerRepository } from "../../domain/repositories/logger.repository";
 import { DataConfigRepository } from "../../domain/repositories/data-config.repository";
-import { DataConfigInterfaceDto } from "../../share/dtos/data-config-interface.dto";
+import { DataConfigInterfaceDto } from "../../share/config/dtos/data-config-interface.dto";
+import { AppStateService } from "../../share/state/app-state.service";
 
 @Injectable()
 export class RegisterResourcesService{
@@ -15,8 +16,9 @@ export class RegisterResourcesService{
   private register_resources_out: RegisterResourcesOutEntity;
 
   constructor(
-    @Inject(LoggerRepository) readonly winston: LoggerRepository,
-    @Inject(DataConfigRepository) readonly env_data: DataConfigRepository,
+    private readonly app_state: AppStateService,
+    @Inject(LoggerRepository) private readonly  winston: LoggerRepository,
+    @Inject(DataConfigRepository) private readonly env_data: DataConfigRepository,
     @Inject(RegisterResourcesRepository) private readonly db: RegisterResourcesRepository
   ){}
 
@@ -55,6 +57,10 @@ export class RegisterResourcesService{
 
   get_logger_repository(): LoggerRepository{
     return this.winston;
+  }
+
+  get_app_state(): AppStateService{
+    return this.app_state;
   }
 
 }

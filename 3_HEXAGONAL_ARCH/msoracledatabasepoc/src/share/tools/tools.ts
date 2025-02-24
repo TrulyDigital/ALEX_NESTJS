@@ -1,6 +1,6 @@
 import { ValidationError } from "class-validator";
 import { fromZonedTime, format } from "date-fns-tz";
-import { FaultDto } from "../dtos/fault.dto";
+import { FaultDto } from "../exception/dtos/fault.dto";
 import { ErrorCodes, ErrorMessages } from "../enums/error-codes-and-messages.enum";
 import { LegacyNames } from "../enums/legacy-names.enum";
 

@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { Request, Response, NextFunction } from "express";
-import { AppStateService } from "../../share/services/app-state.service";
+import { AppStateService } from "../../share/state/app-state.service";
 import { v4 as uuid } from "uuid";
 
 @Injectable()

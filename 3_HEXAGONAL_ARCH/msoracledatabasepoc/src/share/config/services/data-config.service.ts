@@ -2,12 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { CircuitBreakerConfigService } from "./circuit-breaker-config.service";
 import { DatabaseConfigService } from "./database-config.service";
 import { EnvironmentConfigService } from "./environment-config.service";
-import { DataConfigInfraestructureDto } from "../../dtos/data-config-infraestructure.dto";
-import { DataConfigInterfaceDto } from "../../dtos/data-config-interface.dto";
+import { DataConfigInfraestructureDto } from "../dtos/data-config-infraestructure.dto";
+import { DataConfigInterfaceDto } from "../dtos/data-config-interface.dto";
 import { DataConfigRepository } from "../../../domain/repositories/data-config.repository";
 
 @Injectable()
-export class AllConfigService implements DataConfigRepository{
+export class DataConfigService implements DataConfigRepository{
 
   constructor(
     private readonly circuit_breaker_config: CircuitBreakerConfigService,

@@ -1,6 +1,6 @@
 import { IsDefined, IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
-import { ErrorCodes, ErrorMessages } from "../enums/error-codes-and-messages.enum";
-import { LegacyNames } from "../enums/legacy-names.enum";
+import { ErrorCodes, ErrorMessages } from "../../enums/error-codes-and-messages.enum";
+import { LegacyNames } from "../../enums/legacy-names.enum";
 import { Type } from "class-transformer";
 
 class ErrorDto{

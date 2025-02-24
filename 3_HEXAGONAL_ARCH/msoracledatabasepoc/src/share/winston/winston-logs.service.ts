@@ -28,5 +28,4 @@ export class WinstonLoggerService implements LoggerRepository{
       child_logger.info(logger.get_logger_object().message);
     }
   }
-  
 }

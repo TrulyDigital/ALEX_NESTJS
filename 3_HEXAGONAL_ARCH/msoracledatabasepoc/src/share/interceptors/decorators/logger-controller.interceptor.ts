@@ -1,9 +1,9 @@
 import { HttpException } from "@nestjs/common";
-import { LoggerEntity } from "../../domain/entities/logger.entity";
-import { LoggerRepository } from "../../domain/repositories/logger.repository";
-import { DataConfigInterfaceDto } from "../dtos/data-config-interface.dto";
-import { AppStateService } from "../services/app-state.service";
-import { tools } from "../tools/tools";
+import { LoggerEntity } from "../../../domain/entities/logger.entity";
+import { LoggerRepository } from "../../../domain/repositories/logger.repository";
+import { DataConfigInterfaceDto } from "../../config/dtos/data-config-interface.dto";
+import { AppStateService } from "../../state/app-state.service";
+import { tools } from "../../tools/tools";
 
 export function LoggerControllerInterceptor<IN,OUT,FAULT>(): InterceptorType{
   return function(
@@ -25,7 +25,10 @@ export function LoggerControllerInterceptor<IN,OUT,FAULT>(): InterceptorType{
       // -------------------------
 
       // services
-      const app_state: AppStateService = this.get_app_state();
+      const app_state: AppStateService = this
+        .get_register_resources_service()
+        .get_app_state();
+        
       const logger: LoggerRepository = this
         .get_register_resources_service()
         .get_logger_repository();

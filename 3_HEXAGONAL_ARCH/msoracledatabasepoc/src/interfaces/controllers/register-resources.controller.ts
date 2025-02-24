@@ -3,9 +3,8 @@ import { InRegisterResourcesDto } from "../../application/dtos/in-register-resou
 import { RegisterResourcesService } from "../../application/services/register-resources.service";
 import { routes } from "../routes/routes";
 import { OutRegisterResourcesDto } from "../../application/dtos/out-register-resources.dto";
-import { LoggerControllerInterceptor } from "../../share/interceptors/logger-controller.interceptor";
-import { AppStateService } from "../../share/services/app-state.service";
-import { FaultDto } from "../../share/dtos/fault.dto";
+import { LoggerControllerInterceptor } from "../../share/interceptors/decorators/logger-controller.interceptor";
+import { FaultDto } from "../../share/exception/dtos/fault.dto";
 
 type IN = InRegisterResourcesDto;
 type OUT = OutRegisterResourcesDto;
@@ -15,7 +14,6 @@ type FAULT = FaultDto;
 export class RegisterResourcesController{
 
   constructor(
-    private readonly app_state: AppStateService,
     private readonly register_resources: RegisterResourcesService,
   ){}
 
@@ -41,10 +39,6 @@ export class RegisterResourcesController{
    * Method Class
    * 
    */
-
-  get_app_state(): AppStateService{
-    return this.app_state;
-  }
 
   get_register_resources_service(): RegisterResourcesService{
     return this.register_resources;

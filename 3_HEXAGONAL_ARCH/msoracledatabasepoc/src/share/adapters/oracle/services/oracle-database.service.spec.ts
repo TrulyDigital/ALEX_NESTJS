@@ -1,17 +1,12 @@
-import { GatewayTimeoutException, Injectable, InternalServerErrorException } from "@nestjs/common";
-import { OracleDatabaseStrategy } from "./oracle-database.strategy";
+import { Injectable } from "@nestjs/common";
+import { OracleDatabaseStrategy } from "../strategy/oracle-database.strategy";
 import { OracleConnectionDto } from "../dtos/oracle-connection.dto";
-import { FaultDto } from "../../share/exception/dtos/fault.dto";
-import { tools } from "../../share/tools/tools";
-import { LegacyNames } from "../../share/enums/legacy-names.enum";
 
 @Injectable()
 export class OracleDatabaseServiceSpec implements OracleDatabaseStrategy{
   
   execute_oracle_store_procedure(
-    transaction_id: string,
     timeout: number,
-    legacy: LegacyNames,
     oracle_connection: OracleConnectionDto, 
     string_contract: string, 
     object_contract: any
@@ -24,21 +19,11 @@ export class OracleDatabaseServiceSpec implements OracleDatabaseStrategy{
      */
 
     if(object_contract['vciccid'] === '001'){
-      const fault: FaultDto = tools.get_fault_CODE_001(
-        'Oracle error', 
-        transaction_id, 
-        legacy,
-      );
-      throw new InternalServerErrorException(fault);
+      throw new Error('Oracle Database Error');
     }
 
     if(object_contract['vciccid'] === '002'){
-      const fault: FaultDto = tools.get_fault_CODE_002(
-        'Error: timeout', 
-        transaction_id, 
-        legacy
-      );
-      throw new GatewayTimeoutException(fault);
+      throw new Error('timeout');
     }
 
     // bad gateway

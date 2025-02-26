@@ -1,8 +1,9 @@
-import { LoggerRepository } from "src/domain/repositories/logger.repository";
+import { LoggerRepository } from "../../logger/repositories/logger.repository";
 import { AppStateService } from "../../state/app-state.service";
 import { DataConfigInterfaceDto } from "../../config/dtos/data-config-interface.dto";
-import { LoggerEntity } from "src/domain/entities/logger.entity";
+import { LoggerEntity } from "../../logger/entities/logger.entity";
 import { tools } from "../../tools/tools";
+import { LayerNames } from "../../enums/layer-names.enum";
 
 export function LoggerValidationPipeInteceptor<IN,OUT,FAULT>(): InterceptorType{
   return function (
@@ -40,7 +41,7 @@ export function LoggerValidationPipeInteceptor<IN,OUT,FAULT>(): InterceptorType{
       );
       logger_entity.set_verb(verb);
       logger_entity.set_transaction_id(transaction_id);
-      logger_entity.set_layer('Controller');
+      logger_entity.set_layer(LayerNames.INTERFACE);
       logger_entity.set_request(body_in);
       const init_time: number = new Date().getTime();
 
@@ -57,11 +58,14 @@ export function LoggerValidationPipeInteceptor<IN,OUT,FAULT>(): InterceptorType{
 
       // we are in http exception flow so we are in catch block
 
+      const validation_error_request: string | string[] = app_state.get_validation_error_request();
+
       logger_entity.set_type('error');
       logger_entity.set_message('error from controller');
       logger_entity.set_processing_time(end_time-init_time);
       logger_entity.set_time_stamp(tools.get_current_date());
       logger_entity.set_response(result_method);
+      logger_entity.set_error(validation_error_request);
 
       logger.write<IN,OUT,FAULT>(logger_entity);
       return result_method;

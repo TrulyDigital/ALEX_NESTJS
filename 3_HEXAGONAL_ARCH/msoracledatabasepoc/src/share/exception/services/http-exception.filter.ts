@@ -5,14 +5,12 @@ import { plainToInstance } from "class-transformer";
 import { FaultNestDto } from "../dtos/fault-nestjs.dto";
 import { validate, ValidationError } from "class-validator";
 import { AppStateService } from "../../state/app-state.service"
-import { LegacyNames } from "../../enums/legacy-names.enum";
-import { ErrorCodes, ErrorMessages } from "../../enums/error-codes-and-messages.enum";
+import { ErrorHttpDescriptions, ErrorHttpMessagesInterface } from "../../enums/error-codes-and-messages.enum";
 import { HttpVerbs } from "../../enums/http-verbs.enum";
-import { LoggerRepository } from "../../../domain/repositories/logger.repository";
-import { DataConfigRepository } from "../../../domain/repositories/data-config.repository";
+import { LoggerRepository } from "../../logger/repositories/logger.repository";
+import { DataConfigRepository } from "../../config/repositories/data-config.repository";
 import { DataConfigInterfaceDto } from "../../config/dtos/data-config-interface.dto";
 import { LoggerValidationPipeInteceptor } from "../../interceptors/decorators/logger-validation-pipe.interceptor";
-import { tools } from "../../tools/tools";
 
 type IN = unknown;
 type OUT = FaultDto;
@@ -58,7 +56,7 @@ export class HttpExceptionFilter implements ExceptionFilter{
    * 
    * @description
    * 
-   * Catch all Http Exceptions
+   * Catch all Http Exceptions 
    * 
    */
 
@@ -115,8 +113,14 @@ export class HttpExceptionFilter implements ExceptionFilter{
     // it doesn't include a logger yet
     if(validation_error_nestjs_fault.length === 0){
 
+      let fault_nest: FaultNestDto = catch_fault as unknown as FaultNestDto;
+
+      this.app_state.set_validation_error_request(
+        fault_nest.message,
+      );
+
       const fault_response: FaultDto = this.get_new_fault_from_nestjs_fault(
-        catch_fault,
+        fault_nest,
       );
 
       return response_express
@@ -147,24 +151,36 @@ export class HttpExceptionFilter implements ExceptionFilter{
     let fault: FaultNestDto = catch_fault as unknown as FaultNestDto;
     const status_code: number = fault.statusCode;
 
-    let message_ext: string;
-    if(fault.error !== undefined) message_ext = fault.error;
-    else message_ext = 'Internal Server Error';
-
     const fault_response: FaultDto = {
       transaction_id: this.app_state.get_transaction_id(),
-      status_code: fault.statusCode,
-      message: message_ext,
-      error: {
-        code: this.get_error_code_from_status_code(status_code),
-        message: this.get_error_message_from_status_code(status_code),
-        legacy: LegacyNames.LEGACY_OC,
-        date_time: tools.get_current_date(),
-        description: fault.message,
-      }
+      status_code: status_code,
+      error: this.get_error_http_description(status_code),
+      message: this.get_error_http_message(status_code),
     };
 
     return fault_response;
+  }
+
+  private get_error_http_description(
+    status_code: number
+  ): string{
+    switch(status_code){
+      case(400): return ErrorHttpDescriptions.HTTP_400_DESC;
+      case(404): return ErrorHttpDescriptions.HTTP_400_DESC;
+      case(503): return ErrorHttpDescriptions.HTTP_400_DESC;
+      default: return ErrorHttpDescriptions.HTTP_500_DESC;
+    }
+  }
+
+  private get_error_http_message(
+    status_code: number
+  ): string{
+    switch(status_code){
+      case(400): return ErrorHttpMessagesInterface.HTTP_400_MSG;
+      case(404): return ErrorHttpMessagesInterface.HTTP_404_MSG;
+      case(503): return ErrorHttpMessagesInterface.HTTP_503_MSG;
+      default: return ErrorHttpMessagesInterface.HTTP_500_MSG;
+    }
   }
 
   private validate_request_method(
@@ -192,26 +208,6 @@ export class HttpExceptionFilter implements ExceptionFilter{
         return request_express.body;
       default:
         return undefined;
-    }
-  }
-
-  private get_error_message_from_status_code(
-    code: number
-  ): ErrorMessages{
-    switch(code){
-      case 400: return ErrorMessages.MSG_100_1;
-      case 404: return ErrorMessages.MSG_100_2;
-      default: return ErrorMessages.MSG_111;
-    }
-  }
-
-  private get_error_code_from_status_code(
-    code: number
-  ): ErrorCodes{
-    switch(code){
-      case 400: return ErrorCodes.ERR_100;
-      case 404: return ErrorCodes.ERR_100;
-      default: return ErrorCodes.ERR_111;
     }
   }
 }

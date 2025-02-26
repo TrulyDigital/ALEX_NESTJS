@@ -1,5 +1,5 @@
-import { DataConfigInfraestructureDto } from "../../share/config/dtos/data-config-infraestructure.dto";
-import { DataConfigInterfaceDto } from "../../share/config/dtos/data-config-interface.dto";
+import { DataConfigInfraestructureDto } from "../dtos/data-config-infraestructure.dto";
+import { DataConfigInterfaceDto } from "../dtos/data-config-interface.dto";
 
 export const DataConfigRepository = Symbol('DataConfigRepository');
 

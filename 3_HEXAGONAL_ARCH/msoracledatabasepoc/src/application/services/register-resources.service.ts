@@ -4,8 +4,8 @@ import { InRegisterResourcesDto } from "../dtos/in-register-resources.dto";
 import { RegisterResourcesInEntity } from "../../domain/entities/register-resources-in.entity";
 import { RegisterResourcesOutEntity } from "../../domain/entities/register-resources-out.entity";
 import { OutRegisterResourcesDto } from "../dtos/out-register-resources.dto";
-import { LoggerRepository } from "../../domain/repositories/logger.repository";
-import { DataConfigRepository } from "../../domain/repositories/data-config.repository";
+import { LoggerRepository } from "../../share/logger/repositories/logger.repository";
+import { DataConfigRepository } from "../../share/config/repositories/data-config.repository";
 import { DataConfigInterfaceDto } from "../../share/config/dtos/data-config-interface.dto";
 import { AppStateService } from "../../share/state/app-state.service";
 

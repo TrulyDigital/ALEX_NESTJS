@@ -10,6 +10,7 @@ type LoggerType<T1,T2> = {
   timeStamp: string;
   request: T1;
   response: T2;
+  error: string | string[] | undefined;
 }
 
 export class LoggerEntity <IN,OUT,FAULT>{
@@ -25,6 +26,7 @@ export class LoggerEntity <IN,OUT,FAULT>{
   private timeStamp: string;
   private request: IN;
   private response: FAULT | OUT | string;
+  private error: string | string[] | undefined;
 
   constructor(
     application_name: string,
@@ -76,6 +78,10 @@ export class LoggerEntity <IN,OUT,FAULT>{
     this.response = response;
   }
 
+  set_error(error: string | string[]): void{
+    this.error = error;
+  }
+
   /**
    * 
    * Getters
@@ -83,6 +89,11 @@ export class LoggerEntity <IN,OUT,FAULT>{
    */
 
   get_logger_object(): LoggerType<IN,FAULT | OUT | string>{
+
+    let err: string | string[] | undefined;
+    if(this.error) err = this.error;
+    else err = undefined;
+
     return {
       applicationName: this.applicationName,
       methodName: this.methodName,
@@ -94,7 +105,8 @@ export class LoggerEntity <IN,OUT,FAULT>{
       processingTime: this.processingTime,
       timeStamp: this.timeStamp,
       request: this.request,
-      response: this.response
+      response: this.response,
+      error: err,
     }
   }
 }

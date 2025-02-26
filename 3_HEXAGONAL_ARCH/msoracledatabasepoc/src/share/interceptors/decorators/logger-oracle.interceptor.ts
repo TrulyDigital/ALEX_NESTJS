@@ -1,14 +1,13 @@
 
-import { LoggerEntity } from "../../../domain/entities/logger.entity";
-import { LoggerRepository } from "../../../domain/repositories/logger.repository";
-import { OracleConnectionDto } from "../../../infraestructure/dtos/oracle-connection.dto";
+import { LoggerEntity } from "../../logger/entities/logger.entity";
+import { LoggerRepository } from "../../logger/repositories/logger.repository";
+import { OracleConnectionDto } from "../../adapters/oracle/dtos/oracle-connection.dto";
 import { tools } from "../../tools/tools";
-import { LegacyNames } from "../../enums/legacy-names.enum";
-import { HttpException } from "@nestjs/common";
 import { AppStateService } from "../../state/app-state.service";
 import { DataConfigInfraestructureDto } from "../../config/dtos/data-config-infraestructure.dto";
+import { LayerNames } from "../../enums/layer-names.enum";
 
-export function LoggerOracleInterceptor<IN,OUT,FAULT>(): InterceptorType{
+export function LoggerOracleInterceptor<IN,OUT,CATCH>(): InterceptorType{
   return function(
     target: Object,
     property_key: string | symbol, // method name or class name, it depends on the execution context
@@ -20,9 +19,7 @@ export function LoggerOracleInterceptor<IN,OUT,FAULT>(): InterceptorType{
       
     // overwrite method
     descriptor.value = async function (
-      transaction_id: string,
       timeout: string,
-      legacy: LegacyNames,
       oracle_connection: OracleConnectionDto,
       string_contract: string,
       object_contract: any
@@ -39,16 +36,17 @@ export function LoggerOracleInterceptor<IN,OUT,FAULT>(): InterceptorType{
       // data
       const env_data: DataConfigInfraestructureDto = this.get_data_config();
       const verb: string = app_state.get_verb();
+      const transaction_id: string = app_state.get_transaction_id();
 
 
       // log entity
-      let logger_entity = new LoggerEntity<IN,OUT,FAULT>(
+      let logger_entity = new LoggerEntity<IN,OUT,CATCH>(
         env_data.application_name,
         env_data.operation_connectivity,
       );
       logger_entity.set_verb(verb)
       logger_entity.set_transaction_id(transaction_id);
-      logger_entity.set_layer('Infraestructure');
+      logger_entity.set_layer(LayerNames.INFRAESTRUCTURE);
       logger_entity.set_request(object_contract);
       const init_time: number = new Date().getTime();
            
@@ -58,9 +56,7 @@ export function LoggerOracleInterceptor<IN,OUT,FAULT>(): InterceptorType{
         // -------------------------
 
         const result: Promise<OUT> = await original_method.apply(this, [
-          transaction_id,
           timeout,
-          legacy,
           oracle_connection,
           string_contract,
           object_contract
@@ -78,7 +74,7 @@ export function LoggerOracleInterceptor<IN,OUT,FAULT>(): InterceptorType{
         logger_entity.set_time_stamp(tools.get_current_date());
         logger_entity.set_response(method_result);
 
-        logger.write<IN,OUT,FAULT>(logger_entity);
+        logger.write<IN,OUT,CATCH>(logger_entity);
         return result;
       }
       catch(err: any){
@@ -93,16 +89,9 @@ export function LoggerOracleInterceptor<IN,OUT,FAULT>(): InterceptorType{
         logger_entity.set_message('error from oracle database');
         logger_entity.set_processing_time(end_time-init_time);
         logger_entity.set_time_stamp(tools.get_current_date());
+        logger_entity.set_response(String(err));
 
-        if(err instanceof HttpException){
-          const fault: FAULT = err.getResponse() as FAULT;
-          logger_entity.set_response(fault);
-        }
-        else{
-          logger_entity.set_response(String(err));
-        }
-
-        logger.write<IN,OUT,FAULT>(logger_entity);
+        logger.write<IN,OUT,CATCH>(logger_entity);
         throw err;
       }
     };

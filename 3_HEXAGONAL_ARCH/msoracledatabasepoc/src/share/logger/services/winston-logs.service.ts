@@ -1,5 +1,5 @@
-import { LoggerEntity } from "../../domain/entities/logger.entity";
-import { LoggerRepository } from "../../domain/repositories/logger.repository";
+import { LoggerEntity } from "../entities/logger.entity";
+import { LoggerRepository } from "../repositories/logger.repository";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { Inject, Injectable } from "@nestjs/common";
 
@@ -18,13 +18,15 @@ export class WinstonLoggerService implements LoggerRepository{
     logger: LoggerEntity<T1,T2,F>
   ): void{
 
-    const child_logger: any = this.winston.child(logger);
+    const { type, ...new_logger } = logger.get_logger_object();
 
-    if(logger.get_logger_object().type === 'error'){
+    const child_logger: any = this.winston.child(new_logger);
+
+    if(type === 'error'){
       child_logger.error(logger.get_logger_object().message);
     }
 
-    if(logger.get_logger_object().type === 'info'){
+    if(type === 'info'){
       child_logger.info(logger.get_logger_object().message);
     }
   }

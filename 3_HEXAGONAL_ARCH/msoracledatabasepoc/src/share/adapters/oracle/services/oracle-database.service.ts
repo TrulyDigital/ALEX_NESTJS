@@ -1,18 +1,13 @@
-import { GatewayTimeoutException, Injectable, InternalServerErrorException } from "@nestjs/common";
-import { OracleDatabaseStrategy } from "./oracle-database.strategy";
+import { Injectable } from "@nestjs/common";
+import { OracleDatabaseStrategy } from "../strategy/oracle-database.strategy";
 import { OracleConnectionDto } from "../dtos/oracle-connection.dto";
-import { FaultDto } from "../../share/exception/dtos/fault.dto";
-import { tools } from "../../share/tools/tools";
-import { LegacyNames } from "../../share/enums/legacy-names.enum";
 import * as oracledb from "oracledb";
 
 @Injectable()
 export class OracleDatabaseService implements OracleDatabaseStrategy{
 
   async execute_oracle_store_procedure(
-    transaction_id: string, 
     timeout: number,
-    legacy: LegacyNames,
     oracle_connection: OracleConnectionDto, 
     string_contract: string, 
     object_contract: any
@@ -25,7 +20,7 @@ export class OracleDatabaseService implements OracleDatabaseStrategy{
     try{
       connection = await Promise.race<oracledb.Connection>([
         oracledb.getConnection(oracle_connection),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout)),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout)), 
       ]);
 
       result_query = await connection.execute(
@@ -48,26 +43,7 @@ export class OracleDatabaseService implements OracleDatabaseStrategy{
 
     }
     catch(err: any){
-
-      const err_timeout: boolean = String(err).includes('timeout'); 
-
-      if(err_timeout){
-        const fault: FaultDto = tools.get_fault_CODE_002(
-          String(err), 
-          transaction_id,
-          legacy,
-        );
-        throw new GatewayTimeoutException(fault);
-      }
-      else{
-        const fault: FaultDto = tools.get_fault_CODE_001(
-          String(err), 
-          transaction_id,
-          legacy,
-        );
-        throw new InternalServerErrorException(fault);
-      }
+      throw err;
     }
   }
-
 }

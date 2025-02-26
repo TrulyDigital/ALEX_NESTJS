@@ -1,34 +1,4 @@
-import { IsDefined, IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
-import { ErrorCodes, ErrorMessages } from "../../enums/error-codes-and-messages.enum";
-import { LegacyNames } from "../../enums/legacy-names.enum";
-import { Type } from "class-transformer";
-
-class ErrorDto{
-
-  @IsDefined()
-  @IsNotEmpty()
-  @IsString()
-  code: ErrorCodes;
-
-  @IsDefined()
-  @IsNotEmpty()
-  @IsString()
-  message: ErrorMessages;
-
-  @IsDefined()
-  @IsNotEmpty()
-  @IsString()
-  legacy: LegacyNames;
-
-  @IsDefined()
-  @IsNotEmpty()
-  @IsString()
-  date_time: string;
-
-  @IsDefined()
-  @IsNotEmpty()
-  description: string | string[];
-}
+import { IsDefined, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class FaultDto{
 
@@ -45,9 +15,12 @@ export class FaultDto{
   @IsDefined()
   @IsNotEmpty()
   @IsString()
+  error: string;
+
+  @IsDefined()
+  @IsNotEmpty()
+  @IsString()
   message: string;
 
-  @ValidateNested()
-  @Type(() => ErrorDto)
-  error: ErrorDto;
+  
 }

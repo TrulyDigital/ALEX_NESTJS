@@ -1,9 +1,10 @@
 import { HttpException } from "@nestjs/common";
-import { LoggerEntity } from "../../../domain/entities/logger.entity";
-import { LoggerRepository } from "../../../domain/repositories/logger.repository";
+import { LoggerEntity } from "../../logger/entities/logger.entity";
+import { LoggerRepository } from "../../logger/repositories/logger.repository";
 import { DataConfigInterfaceDto } from "../../config/dtos/data-config-interface.dto";
 import { AppStateService } from "../../state/app-state.service";
 import { tools } from "../../tools/tools";
+import { LayerNames } from "../../enums/layer-names.enum";
 
 export function LoggerControllerInterceptor<IN,OUT,FAULT>(): InterceptorType{
   return function(
@@ -81,11 +82,14 @@ export function LoggerControllerInterceptor<IN,OUT,FAULT>(): InterceptorType{
         // -------------------------
 
         const end_time: number = new Date().getTime();
+        const validation_error_response: string | string[] = app_state.get_validation_error_response();
 
+        logger_entity.set_layer(LayerNames.BUSINESS);
         logger_entity.set_type('error');
         logger_entity.set_message('error from controller');
         logger_entity.set_processing_time(end_time-init_time);
         logger_entity.set_time_stamp(tools.get_current_date());
+        logger_entity.set_error(validation_error_response);
 
         if(err instanceof HttpException){
           const fault: FAULT = err.getResponse() as FAULT;

@@ -1,20 +1,31 @@
-export enum ErrorCodes {
-  // backend #1 - bscs
-  ERR_001 = 'ERR_001',
-  // interface #1 - register resources
-  ERR_100 = 'ERR_100',
-  // unknown
-  ERR_111 = 'ERR_111',
+export enum ErrorHttpCodes {
+  HTTP_400_CODE = 400,
+  HTTP_404_CODE = 404,
+  HTTP_500_CODE = 500,
+  HTTP_502_CODE = 502,
+  HTTP_503_CODE = 503,
+  HTTP_504_CODE = 504,
 }
 
-export enum ErrorMessages { 
-  // backend #1 - bscs
-  MSG_001_1 = 'Technical error from oracle database',
-  MSG_001_2 = 'Timeout while connecting to the oracle database',
-  MSG_001_3 = 'Validation error in the response from oracle database',
-  // interface #1 - register resources
-  MSG_100_1 = 'Validation error in the request',
-  MSG_100_2 = 'URL not found',
-  // unknown
-  MSG_111 = 'Unknown error',
+export enum ErrorHttpDescriptions {
+  HTTP_400_DESC = 'Bad Request',
+  HTTP_404_DESC = 'Not Found',
+  HTTP_500_DESC = 'Internal Server Error',
+  HTTP_502_DESC = 'Bad Gateway',
+  HTTP_503_DESC = 'Service Unavailable',
+  HTTP_504_DESC = 'Gateway TImeout',
+}
+
+export enum ErrorHttpMessagesInfraestructure {
+  // oracle
+  HTTP_500_MSG_1 = 'Technical error from database',
+  HTTP_502_MSG_1 = 'Invalid response from the database',
+  HTTP_504_MSG_1 = 'Timeout error from database',
+}
+
+export enum ErrorHttpMessagesInterface {
+  HTTP_400_MSG = 'Invalid input data, check the technical log for transaction_id',
+  HTTP_404_MSG = 'Operation or URL could not be found',
+  HTTP_500_MSG = 'Internal Server Error',
+  HTTP_503_MSG = 'Circuit Breaker, service unavailable, please wait',
 }

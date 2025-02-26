@@ -4,7 +4,6 @@ import { RegisterResourcesOutEntity } from "../entities/register-resources-out.e
 export const RegisterResourcesRepository = Symbol('RegisterResourcesRepository');
 
 export interface RegisterResourcesRepository{
-
   update_one(
     register_resources_in: RegisterResourcesInEntity
   ): Promise<RegisterResourcesOutEntity>;

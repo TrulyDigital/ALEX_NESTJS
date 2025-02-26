@@ -1,9 +1,7 @@
-import { LegacyNames } from "../../enums/legacy-names.enum";
-import { OracleConnectionDto } from "../../../infraestructure/dtos/oracle-connection.dto";
-import { DataConfigInfraestructureDto } from "../../config/dtos/data-config-infraestructure.dto";
+import { AppStateService } from "../../state/app-state.service";
 import * as apm from 'elastic-apm-node';
 
-export function ApmOracleInterceptor(): InterceptorType{
+export function ApmInterceptor(): InterceptorType{
   return function(
     target: Object,
     property_key: string | symbol,
@@ -15,12 +13,7 @@ export function ApmOracleInterceptor(): InterceptorType{
 
     // overwrite method
     descriptor.value = async function (
-      transaction_id: string,
-      timeout: string,
-      legacy: LegacyNames,
-      oracle_connection: OracleConnectionDto,
-      string_contract: string,
-      object_contract: any
+      ...args: any[]
     ): Promise<unknown> {
 
       // -------------------------
@@ -28,15 +21,15 @@ export function ApmOracleInterceptor(): InterceptorType{
       // -------------------------
 
       // data
-      const env_data: DataConfigInfraestructureDto = this.get_data_config();
+      const app_state: AppStateService = this.get_app_state();
       
       // apm
       const init_time: number = new Date().getTime();
       let apm_span: apm.Span | null = apm.startSpan(
-        `${env_data.database_procedure_path}`,
-        'Database',
-        'Oracle',
-        'find',
+        app_state.get_apm_span_data(property_key as string).span_name,
+        app_state.get_apm_span_data(property_key as string).span_type,
+        app_state.get_apm_span_data(property_key as string).span_sub_type,
+        app_state.get_apm_span_data(property_key as string).span_action,
       );
       
       try{
@@ -45,14 +38,7 @@ export function ApmOracleInterceptor(): InterceptorType{
         // execute original method
         // -------------------------
 
-        const result: Promise<any> = await original_method.apply(this, [
-          transaction_id,
-          timeout,
-          legacy,
-          oracle_connection,
-          string_contract,
-          object_contract
-        ]);
+        const result: Promise<any> = await original_method.apply(this, args);
         const end_time: number = new Date().getTime();
 
         // -------------------------

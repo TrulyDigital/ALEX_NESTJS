@@ -4,7 +4,7 @@ import { DatabaseConfigService } from "./database-config.service";
 import { EnvironmentConfigService } from "./environment-config.service";
 import { DataConfigInfraestructureDto } from "../dtos/data-config-infraestructure.dto";
 import { DataConfigInterfaceDto } from "../dtos/data-config-interface.dto";
-import { DataConfigRepository } from "../../../domain/repositories/data-config.repository";
+import { DataConfigRepository } from "../repositories/data-config.repository";
 
 @Injectable()
 export class DataConfigService implements DataConfigRepository{

@@ -1,29 +1,29 @@
-import { BadGatewayException, Inject, Injectable } from "@nestjs/common";
+import { BadGatewayException, GatewayTimeoutException, Inject, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { RegisterResourcesInEntity } from "../../domain/entities/register-resources-in.entity";
 import { RegisterResourcesOutEntity } from "../../domain/entities/register-resources-out.entity";
 import { RegisterResourcesRepository } from "../../domain/repositories/register-resources.repository";
-import { OracleDatabaseStrategy } from "../oracle/oracle-database.strategy";
-import { OracleConnectionDto } from "../dtos/oracle-connection.dto";
-import { OracleDatabaseService } from "../oracle/oracle-database.service";
+import { OracleDatabaseStrategy } from "../../share/adapters/oracle/strategy/oracle-database.strategy";
+import { OracleConnectionDto } from "../../share/adapters/oracle/dtos/oracle-connection.dto";
+import { OracleDatabaseService } from "../../share/adapters/oracle/services/oracle-database.service";
 import { OutPrcRegistraUsuariosDto } from "../dtos/out-prc-registra-usuarios.dto";
-import { OracleDatabaseServiceSpec } from "../oracle/oracle-database.service.spec";
+import { OracleDatabaseServiceSpec } from "../../share/adapters/oracle/services/oracle-database.service.spec";
 import { LoggerOracleInterceptor } from "../../share/interceptors/decorators/logger-oracle.interceptor";
 import { AppStateService } from "../../share/state/app-state.service";
-import { LoggerRepository } from "../../domain/repositories/logger.repository";
+import { LoggerRepository } from "../../share/logger/repositories/logger.repository";
 import { plainToInstance } from "class-transformer";
 import { validate, ValidationError } from "class-validator";
 import { tools } from "../../share/tools/tools";
 import { FaultDto } from "../../share/exception/dtos/fault.dto";
-import { ErrorCodes, ErrorMessages } from "../../share/enums/error-codes-and-messages.enum";
-import { LegacyNames } from "../../share/enums/legacy-names.enum";
-import { ApmOracleInterceptor } from "../../share/interceptors/decorators/apm-oracle.interceptor";
-import { DataConfigRepository } from "../../domain/repositories/data-config.repository";
+import { ErrorHttpDescriptions, ErrorHttpMessagesInfraestructure } from "../../share/enums/error-codes-and-messages.enum";
+import { ApmInterceptor } from "../../share/interceptors/decorators/apm.interceptor";
+import { DataConfigRepository } from "../../share/config/repositories/data-config.repository";
 import { DataConfigInfraestructureDto } from "../../share/config/dtos/data-config-infraestructure.dto";
+import { ErrorHttpCodes } from "../../share/enums/error-codes-and-messages.enum";
 import * as oracledb from 'oracledb';
 
 type IN = any;
 type OUT = OutPrcRegistraUsuariosDto;
-type FAULT = FaultDto;
+type CATCH = string;
 
 @Injectable()
 export class PrcRegistraUsuariosService implements RegisterResourcesRepository, OracleDatabaseStrategy{
@@ -77,21 +77,17 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
    * 
    */
 
-  @ApmOracleInterceptor()
-  @LoggerOracleInterceptor<IN,OUT,FAULT>()
+  @ApmInterceptor()
+  @LoggerOracleInterceptor<IN,OUT,CATCH>()
   async execute_oracle_store_procedure(
-    transaction_id: string,
     timeout: number,
-    legacy: LegacyNames,
     oracle_connection: OracleConnectionDto, 
     string_contract: string, 
     object_contract: any
   ): Promise<unknown> {
 
     const result: unknown = await this.db.execute_oracle_store_procedure(
-      transaction_id,
       timeout,
-      legacy,
       oracle_connection,
       string_contract,
       object_contract
@@ -114,20 +110,48 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
   ): Promise<RegisterResourcesOutEntity> { 
 
     this.transaction_id = this.app_state.get_transaction_id();
+    let result: unknown;
 
-    const result: unknown = await this.execute_oracle_store_procedure(
-      this.transaction_id,
-      this.timeout,
-      LegacyNames.LEGACY_BSCS,
-      this.get_oracle_connection(),
-      this.get_string_contract(),
-      this.get_object_contract(register_resources_in)
-    );
+    try{
+      result = await this.execute_oracle_store_procedure(
+        this.timeout,
+        this.get_oracle_connection(),
+        this.get_string_contract(),
+        this.get_object_contract(register_resources_in),
+      );
+    }
+    // [ERROR] from database
+    catch(err: any){
+      this.app_state.set_validation_error_response(String(err))
+      const err_timeout: boolean = String(err).includes('timeout');
+      if(err_timeout){
+        const fault: FaultDto = {
+          transaction_id: this.transaction_id,
+          status_code: ErrorHttpCodes.HTTP_504_CODE,
+          error: ErrorHttpDescriptions.HTTP_504_DESC,
+          message: ErrorHttpMessagesInfraestructure.HTTP_504_MSG_1,
+        }
+        throw new GatewayTimeoutException(fault);
+      }
+      else{
+        const fault: FaultDto = {
+          transaction_id: this.transaction_id,
+          status_code: ErrorHttpCodes.HTTP_500_CODE,
+          error: ErrorHttpDescriptions.HTTP_500_DESC,
+          message: ErrorHttpMessagesInfraestructure.HTTP_500_MSG_1,
+        }
+        throw new InternalServerErrorException(fault);
+      }
+    }
+
+    // response validation
 
     const result_validated: OutPrcRegistraUsuariosDto = plainToInstance(
       OutPrcRegistraUsuariosDto,
       result
     );
+
+    // are there any error ?
 
     const validation_error: ValidationError[] = await validate(result_validated);
     
@@ -136,27 +160,26 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
       let description_errors: string[] = tools.get_description_errors_after_validation(
         validation_error
       );
+      this.app_state.set_validation_error_response(description_errors);
 
       const fault: FaultDto = {
         transaction_id: this.transaction_id,
-        status_code: 502,
-        message: 'Bad Gateway',
-        error: {
-          code: ErrorCodes.ERR_001,
-          message: ErrorMessages.MSG_001_3,
-          legacy: LegacyNames.LEGACY_BSCS,
-          date_time: tools.get_current_date(),
-          description: description_errors
-        }
+        status_code: ErrorHttpCodes.HTTP_502_CODE,
+        error: ErrorHttpDescriptions.HTTP_502_DESC,
+        message: ErrorHttpMessagesInfraestructure.HTTP_502_MSG_1,
       }
       throw new BadGatewayException(fault);
     }
+
+    // success response
 
     const register_resources_out = new RegisterResourcesOutEntity();
     register_resources_out.set_mobile_number(result_validated.vcmsisdn); 
     register_resources_out.set_output_code(result_validated.vccodsal);
     register_resources_out.set_output_description(result_validated.vcdessal);
     register_resources_out.set_transaction_id(this.transaction_id);
+
+    // result
 
     return register_resources_out;
   } 

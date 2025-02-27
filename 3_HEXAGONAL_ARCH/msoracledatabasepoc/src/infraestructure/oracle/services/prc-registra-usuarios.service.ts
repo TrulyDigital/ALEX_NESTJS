@@ -1,24 +1,24 @@
 import { BadGatewayException, GatewayTimeoutException, Inject, Injectable, InternalServerErrorException } from "@nestjs/common";
-import { RegisterResourcesInEntity } from "../../domain/entities/register-resources-in.entity";
-import { RegisterResourcesOutEntity } from "../../domain/entities/register-resources-out.entity";
-import { RegisterResourcesRepository } from "../../domain/repositories/register-resources.repository";
-import { OracleDatabaseStrategy } from "../../share/adapters/oracle/strategy/oracle-database.strategy";
-import { OracleConnectionDto } from "../../share/adapters/oracle/dtos/oracle-connection.dto";
-import { OracleDatabaseService } from "../../share/adapters/oracle/services/oracle-database.service";
+import { RegisterResourcesInEntity } from "../../../domain/entities/register-resources-in.entity";
+import { RegisterResourcesOutEntity } from "../../../domain/entities/register-resources-out.entity";
+import { RegisterResourcesRepository } from "../../../domain/repositories/register-resources.repository";
+import { OracleDatabaseStrategy } from "../../../share/adapters/oracle/strategy/oracle-database.strategy";
+import { OracleConnectionDto } from "../../../share/adapters/oracle/dtos/oracle-connection.dto";
+import { OracleDatabaseService } from "../../../share/adapters/oracle/services/oracle-database.service";
 import { OutPrcRegistraUsuariosDto } from "../dtos/out-prc-registra-usuarios.dto";
-import { OracleDatabaseServiceSpec } from "../../share/adapters/oracle/services/oracle-database.service.spec";
-import { LoggerOracleInterceptor } from "../../share/interceptors/decorators/logger-oracle.interceptor";
-import { AppStateService } from "../../share/state/app-state.service";
-import { LoggerRepository } from "../../share/logger/repositories/logger.repository";
+import { OracleDatabaseServiceSpec } from "../../../share/adapters/oracle/services/oracle-database.service.spec";
+import { OracleLogger } from "../../../share/interceptors/decorators/oracle-logger.decorator";
+import { AppStateService } from "../../../share/state/app-state.service";
+import { LoggerRepository } from "../../../share/logger/repositories/logger.repository";
 import { plainToInstance } from "class-transformer";
 import { validate, ValidationError } from "class-validator";
-import { tools } from "../../share/tools/tools";
-import { FaultDto } from "../../share/exception/dtos/fault.dto";
-import { ErrorHttpDescriptions, ErrorHttpMessagesInfraestructure } from "../../share/enums/error-codes-and-messages.enum";
-import { ApmInterceptor } from "../../share/interceptors/decorators/apm.interceptor";
-import { DataConfigRepository } from "../../share/config/repositories/data-config.repository";
-import { DataConfigInfraestructureDto } from "../../share/config/dtos/data-config-infraestructure.dto";
-import { ErrorHttpCodes } from "../../share/enums/error-codes-and-messages.enum";
+import { tools } from "../../../share/tools/tools";
+import { FaultDto } from "../../../share/exception/dtos/fault.dto";
+import { ErrorHttpDescriptions, ErrorHttpMessagesInfraestructure } from "../../../share/enums/error-codes-and-messages.enum";
+import { ApmAgent } from "../../../share/interceptors/decorators/apm-agent.decorator";
+import { DataConfigRepository } from "../../../share/config/repositories/data-config.repository";
+import { DataConfigInfraestructureDto } from "../../../share/config/dtos/data-config-infraestructure.dto";
+import { ErrorHttpCodes } from "../../../share/enums/error-codes-and-messages.enum";
 import * as oracledb from 'oracledb';
 
 type IN = any;
@@ -77,8 +77,8 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
    * 
    */
 
-  @ApmInterceptor()
-  @LoggerOracleInterceptor<IN,OUT,CATCH>()
+  @ApmAgent()
+  @OracleLogger<IN,OUT,CATCH>()
   async execute_oracle_store_procedure(
     timeout: number,
     oracle_connection: OracleConnectionDto, 

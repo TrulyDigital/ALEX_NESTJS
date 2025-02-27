@@ -5,7 +5,7 @@ import { LoggerEntity } from "../../logger/entities/logger.entity";
 import { tools } from "../../tools/tools";
 import { LayerNames } from "../../enums/layer-names.enum";
 
-export function LoggerValidationPipeInteceptor<IN,OUT,FAULT>(): InterceptorType{
+export function LoggerValidationPipe<IN,OUT,FAULT>(): InterceptorType{
   return function (
     target: any, 
     propertyKey: string, 
@@ -37,7 +37,7 @@ export function LoggerValidationPipeInteceptor<IN,OUT,FAULT>(): InterceptorType{
       // lo entity
       let logger_entity = new LoggerEntity<IN,OUT,FAULT>(
         env_data.application_name,
-        env_data.operation_controller,
+        env_data.operation_controller_1,
       );
       logger_entity.set_verb(verb);
       logger_entity.set_transaction_id(transaction_id);

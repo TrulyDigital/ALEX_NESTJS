@@ -7,7 +7,7 @@ import { AppStateService } from "../../state/app-state.service";
 import { DataConfigInfraestructureDto } from "../../config/dtos/data-config-infraestructure.dto";
 import { LayerNames } from "../../enums/layer-names.enum";
 
-export function LoggerOracleInterceptor<IN,OUT,CATCH>(): InterceptorType{
+export function OracleLogger<IN,OUT,CATCH>(): InterceptorType{
   return function(
     target: Object,
     property_key: string | symbol, // method name or class name, it depends on the execution context

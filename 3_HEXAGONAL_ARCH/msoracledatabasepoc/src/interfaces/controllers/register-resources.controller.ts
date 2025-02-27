@@ -3,7 +3,7 @@ import { InRegisterResourcesDto } from "../../application/dtos/in-register-resou
 import { RegisterResourcesService } from "../../application/services/register-resources.service";
 import { routes } from "../routes/routes";
 import { OutRegisterResourcesDto } from "../../application/dtos/out-register-resources.dto";
-import { LoggerControllerInterceptor } from "../../share/interceptors/decorators/logger-controller.interceptor";
+import { LoggerController } from "../../share/interceptors/decorators/logger-controller.decorator";
 import { FaultDto } from "../../share/exception/dtos/fault.dto";
 
 type IN = InRegisterResourcesDto;
@@ -26,7 +26,7 @@ export class RegisterResourcesController{
   @Post(routes.APPLICATION_OPERATION_REGISTER_RESOURCES)
   @HttpCode(200)
   @UsePipes(ValidationPipe)
-  @LoggerControllerInterceptor<IN,OUT,FAULT>()
+  @LoggerController<IN,OUT,FAULT>()
   async update_register_resources(
     @Body() body_in: InRegisterResourcesDto
   ): Promise<OutRegisterResourcesDto>{

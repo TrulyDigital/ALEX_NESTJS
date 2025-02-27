@@ -6,7 +6,7 @@ import { AppStateService } from "../../state/app-state.service";
 import { tools } from "../../tools/tools";
 import { LayerNames } from "../../enums/layer-names.enum";
 
-export function LoggerControllerInterceptor<IN,OUT,FAULT>(): InterceptorType{
+export function LoggerController<IN,OUT,FAULT>(): InterceptorType{
   return function(
     target: any,
     propertyKey: string | symbol,

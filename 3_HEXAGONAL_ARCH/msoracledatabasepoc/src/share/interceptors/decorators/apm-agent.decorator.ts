@@ -1,7 +1,7 @@
 import { AppStateService } from "../../state/app-state.service";
 import * as apm from 'elastic-apm-node';
 
-export function ApmInterceptor(): InterceptorType{
+export function ApmAgent(): InterceptorType{
   return function(
     target: Object,
     property_key: string | symbol,

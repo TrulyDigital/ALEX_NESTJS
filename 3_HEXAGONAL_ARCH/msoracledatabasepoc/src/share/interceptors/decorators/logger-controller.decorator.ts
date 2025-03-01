@@ -90,7 +90,7 @@ export function LoggerController<IN,OUT,FAULT>(): InterceptorType{
         logger_entity.set_processing_time(end_time-init_time);
         logger_entity.set_time_stamp(tools.get_current_date());
         logger_entity.set_error(validation_error_response);
-
+        console.log(err);
         if(err instanceof HttpException){
           const fault: FAULT = err.getResponse() as FAULT;
           logger_entity.set_response(fault);

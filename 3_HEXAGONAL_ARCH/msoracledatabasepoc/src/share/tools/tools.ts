@@ -1,5 +1,8 @@
 import { ValidationError } from "class-validator";
 import { fromZonedTime, format } from "date-fns-tz";
+import { createLogger } from "winston";
+import * as winston from 'winston';
+import { format as winston_format } from 'winston';
 
 /**
  * 
@@ -37,8 +40,16 @@ function get_description_errors_after_validation(
   return description_errors;
 }
 
+function get_winston_instance(): winston.Logger{
+  const winston_logger = createLogger({
+    transports: [new winston.transports.Console({format: winston.format.json()})]
+  });
+  return winston_logger;
+}
+
 export const tools = {
   get_current_date,
   get_description_errors_after_validation,
   //
+  get_winston_instance,
 }

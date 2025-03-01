@@ -21,7 +21,7 @@ export function ApmAgent(): InterceptorType{
       // -------------------------
 
       // data
-      const app_state: AppStateService = this.get_app_state();
+      const app_state: AppStateService = this.app_state;
       
       // apm
       const init_time: number = new Date().getTime();

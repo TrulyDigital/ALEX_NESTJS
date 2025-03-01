@@ -6,6 +6,9 @@ import { tools } from "../../tools/tools";
 import { AppStateService } from "../../state/app-state.service";
 import { DataConfigInfraestructureDto } from "../../config/dtos/data-config-infraestructure.dto";
 import { LayerNames } from "../../enums/layer-names.enum";
+import { DataConfigRepository } from "../../config/repositories/data-config.repository";
+import { WinstonLoggerService } from "../../logger/services/winston-logs.service";
+import * as winston from 'winston';
 
 export function OracleLogger<IN,OUT,CATCH>(): InterceptorType{
   return function(
@@ -29,20 +32,23 @@ export function OracleLogger<IN,OUT,CATCH>(): InterceptorType{
       // before
       // -------------------------
 
-      // services
-      const app_state: AppStateService = this.get_app_state();
-      let logger: LoggerRepository = this.get_logger_repository();
+      // services from class
+      const app_state: AppStateService = this.app_state;
+      const data_config: DataConfigRepository = this.data_config;
+
+      // crete winston logger
+      const winston: winston.Logger = tools.get_winston_instance();
+      const logger: LoggerRepository = new WinstonLoggerService(winston);
 
       // data
-      const env_data: DataConfigInfraestructureDto = this.get_data_config();
+      const data_env: DataConfigInfraestructureDto = data_config.get_data_config_infraestructure();
       const verb: string = app_state.get_verb();
       const transaction_id: string = app_state.get_transaction_id();
 
-
-      // log entity
+      // logger entity
       let logger_entity = new LoggerEntity<IN,OUT,CATCH>(
-        env_data.application_name,
-        env_data.operation_connectivity,
+        data_env.application_name,
+        data_env.operation_connectivity,
       );
       logger_entity.set_verb(verb)
       logger_entity.set_transaction_id(transaction_id);
@@ -89,7 +95,7 @@ export function OracleLogger<IN,OUT,CATCH>(): InterceptorType{
         logger_entity.set_message('error from oracle database');
         logger_entity.set_processing_time(end_time-init_time);
         logger_entity.set_time_stamp(tools.get_current_date());
-        logger_entity.set_response(String(err));
+        logger_entity.set_response(err);
 
         logger.write<IN,OUT,CATCH>(logger_entity);
         throw err;

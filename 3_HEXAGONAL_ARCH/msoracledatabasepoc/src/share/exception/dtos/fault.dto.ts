@@ -21,6 +21,4 @@ export class FaultDto{
   @IsNotEmpty()
   @IsString()
   message: string;
-
-  
 }

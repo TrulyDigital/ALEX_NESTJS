@@ -9,7 +9,6 @@ import { OutPrcRegistraUsuariosDto } from "../dtos/out-prc-registra-usuarios.dto
 import { OracleDatabaseServiceSpec } from "../../../share/adapters/oracle/services/oracle-database.service.spec";
 import { OracleLogger } from "../../../share/interceptors/decorators/oracle-logger.decorator";
 import { AppStateService } from "../../../share/state/app-state.service";
-import { LoggerRepository } from "../../../share/logger/repositories/logger.repository";
 import { plainToInstance } from "class-transformer";
 import { validate, ValidationError } from "class-validator";
 import { tools } from "../../../share/tools/tools";
@@ -38,10 +37,9 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
   // constructor
   constructor(
     private readonly app_state: AppStateService,
-    @Inject(DataConfigRepository) private readonly env_data: DataConfigRepository,
-    @Inject(LoggerRepository) private readonly winston: LoggerRepository
+    @Inject(DataConfigRepository) private readonly data_config: DataConfigRepository,
   ){
-    this.config = this.env_data.get_data_config_infraestructure();
+    this.config = this.data_config.get_data_config_infraestructure();
     this.timeout = this.config.timeout;
     this.database_procedure_path = this.config.database_procedure_path;
 
@@ -49,25 +47,7 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
     if(context.toLowerCase() === 'test') this.db = new OracleDatabaseServiceSpec();
     else this.db = new OracleDatabaseService();
   }
-
-  /**
-   * 
-   * Getters 
-   * 
-   */
-
-  get_app_state(): AppStateService{
-    return this.app_state;
-  }
-
-  get_data_config(): DataConfigInfraestructureDto{
-    return this.env_data.get_data_config_infraestructure();
-  }
-
-  get_logger_repository(): LoggerRepository{
-    return this.winston;
-  }
-
+  
 
   /**
    * 
@@ -122,7 +102,7 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
     }
     // [ERROR] from database
     catch(err: any){
-      this.app_state.set_validation_error_response(String(err))
+      this.app_state.set_validation_error_response(String(err));
       const err_timeout: boolean = String(err).includes('timeout');
       if(err_timeout){
         const fault: FaultDto = {

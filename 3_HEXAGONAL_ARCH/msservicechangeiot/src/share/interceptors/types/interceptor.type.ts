@@ -1,1 +1,0 @@
-type InterceptorType = (target: any, propertyKey: string, descriptor: PropertyDescriptor) => void;

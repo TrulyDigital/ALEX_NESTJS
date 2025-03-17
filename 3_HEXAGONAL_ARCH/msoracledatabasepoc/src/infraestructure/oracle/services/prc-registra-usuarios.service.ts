@@ -72,7 +72,6 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
       string_contract,
       object_contract
     );
-
     return result;
   }
 
@@ -92,6 +91,7 @@ export class PrcRegistraUsuariosService implements RegisterResourcesRepository, 
     this.transaction_id = this.app_state.get_transaction_id();
     let result: unknown;
 
+    // [SUCCESS] process
     try{
       result = await this.execute_oracle_store_procedure(
         this.timeout,

@@ -36,6 +36,7 @@
     "dotenv": "^16.4.7",
     "elastic-apm-node": "^4.11.0",
     "helmet": "^8.0.0",
+    "msoracledatabasepoc": "file:",
     "nest-winston": "^1.10.2",
     "oracledb": "^6.7.2",
     "reflect-metadata": "^0.2.2",

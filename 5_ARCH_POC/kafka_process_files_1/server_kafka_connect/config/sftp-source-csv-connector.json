@@ -1,0 +1,28 @@
+{
+    "name": "sftp-source-csv-connector",
+    "config": {
+        "connector.class": "io.confluent.connect.sftp.SftpCsvSourceConnector",
+        "tasks.max": "1",
+        "kafka.topic": "csv-to-row-topic",
+        "input.path": "/pry_terminals/1_unprocessed/",
+        "finished.path": "/pry_terminals/2_processed/",
+        "error.path": "/pry_terminals/error/",
+        "input.file.pattern": ".*\\.csv",
+        "cleanup.policy": "MOVE",
+        "sftp.host": "server-sftp",
+        "sftp.port": "22",
+        "sftp.username": "sftp_user",
+        "sftp.password": "sftp_password",
+        "csv.first.row.as.header": "true",
+        "schema.generation.enabled": "true",
+        "topic.creation.groups": "csv-topic-group",
+        "topic.creation.csv-topic-group.include": "csv-to-row-topic",
+        "topic.creation.csv-topic-group.replication.factor": "1",
+        "topic.creation.csv-topic-group.partitions": "1",
+        "topic.creation.csv-topic-group.cleanup.policy": "delete",
+        "topic.creation.csv-topic-group.retention.ms": "604800000",
+        "topic.creation.default.replication.factor": 1,
+        "topic.creation.default.partitions": 1,
+        "topic.creation.default.cleanup.policy": "delete"
+    }
+}

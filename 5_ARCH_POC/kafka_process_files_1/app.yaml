@@ -1,0 +1,135 @@
+services:
+    # Zookeeper - necesario para gestionar Kafka
+    kafka-zookeeper-1:
+        image: confluentinc/cp-zookeeper:7.3.0
+        container_name: kafka-zookeeper-1
+        ports:
+            - "2181:2181"
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+        volumes:
+            - ./server_kafka/zookeeper/data:/var/lib/zookeeper/data
+            - ./server_kafka/zookeeper/log:/var/lib/zookeeper/log
+        networks:
+            - kafka-process-files
+
+    # Kafka Broker
+    kafka-broker-1:
+        image: confluentinc/cp-kafka:7.3.0
+        container_name: kafka-broker-1
+        depends_on:
+            - kafka-zookeeper-1
+        ports:
+            - "9092:9092"
+            - "9101:9101"
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: kafka-zookeeper-1:2181
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-1:29092,PLAINTEXT_HOST://localhost:9092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+            KAFKA_JMX_PORT: 9101
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+            KAFKA_NUM_PARTITIONS: 1
+            KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+        volumes:
+            - ./server_kafka/broker1:/var/lib/kafka/data
+        networks:
+            - kafka-process-files
+
+    # Servidor SFTP
+    server-sftp:
+        image: atmoz/sftp:latest
+        container_name: server-sftp
+        ports:
+            - "2222:22"
+        command: sftp_user:sftp_password:::pry_terminals
+        volumes:
+            - ./server_sftp:/home/sftp_user
+        networks:
+            - kafka-process-files
+
+    # Kafka Connect
+    kafka-connect:
+        image: confluentinc/cp-kafka-connect:7.3.0
+        container_name: kafka-connect
+        depends_on:
+            - kafka-broker-1
+        ports:
+            - "8083:8083"
+        environment:
+            CONNECT_BOOTSTRAP_SERVERS: kafka-broker-1:29092
+            CONNECT_REST_PORT: 8083
+            CONNECT_GROUP_ID: "connect-cluster"
+            CONNECT_CONFIG_STORAGE_TOPIC: "connect-configs"
+            CONNECT_OFFSET_STORAGE_TOPIC: "connect-offsets"
+            CONNECT_STATUS_STORAGE_TOPIC: "connect-status"
+            CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+            CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+            CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+            CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+            CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+            CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+            CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
+            CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components,/connectors"
+        volumes:
+            - ./server_kafka_connect/config:/etc/kafka-connect/custom-config
+            - ./server_kafka_connect/connectors:/connectors
+        command:
+            - bash
+            - -c
+            - |
+                echo "Installing connector plugins"
+                # Instalación del conector SFTP
+                confluent-hub install --no-prompt jcustenborder/kafka-connect-spooldir:2.0.65
+                confluent-hub install --no-prompt confluentinc/kafka-connect-sftp:latest
+
+                # Iniciar Kafka Connect con los plugins instalados
+                /etc/confluent/docker/run
+        networks:
+            - kafka-process-files
+
+    # Schema Registry (útil para manejar esquemas)
+    schema-registry:
+        image: confluentinc/cp-schema-registry:7.3.0
+        container_name: schema-registry
+        depends_on:
+            - kafka-broker-1
+        ports:
+            - "8081:8081"
+        environment:
+            SCHEMA_REGISTRY_HOST_NAME: schema-registry
+            SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-broker-1:29092
+            SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+        networks:
+            - kafka-process-files
+
+    # Kafka UI para monitoreo y administración
+    kafka-ui:
+        image: provectuslabs/kafka-ui:latest
+        container_name: kafka-ui
+        depends_on:
+            - kafka-broker-1
+            - schema-registry
+        ports:
+            - "8080:8080"
+        environment:
+            KAFKA_CLUSTERS_0_NAME: local
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:29092
+            KAFKA_CLUSTERS_0_ZOOKEEPER: kafka-zookeeper-1:2181
+            KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
+            KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: kafka-connect
+            KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://kafka-connect:8083
+        networks:
+            - kafka-process-files
+
+networks:
+    kafka-process-files:
+        name: kafka-process-files
+        external: true

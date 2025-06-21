@@ -38,3 +38,12 @@ lerna-debug.log*
 
 # IDE - VSCode of each project
 **/.vscode/*
+
+**/kafka_process_files_1/server_kafka/
+**/kafka_process_files_1/server_kafka/*
+**/kafka_process_files_1/server_kafka/broker1/
+**/kafka_process_files_1/server_kafka/broker1/*
+**/kafka_process_files_1/server_kafka/broker2/
+**/kafka_process_files_1/server_kafka/broker2/*
+**/kafka_process_files_1/server_kafka/zookeeper/
+**/kafka_process_files_1/server_kafka/zookeeper/*
